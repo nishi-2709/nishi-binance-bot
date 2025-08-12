@@ -9,23 +9,38 @@ import os
 from typing import Dict, Any
 from src.config import config
 from src.logger import logger
-from src.api_client import BinanceClient
-from src.market_orders import MarketOrder, MarketOrderManager
-from src.limit_orders import LimitOrder, LimitOrderManager
-from src.advanced.oco import OCOOrder, OCOOrderManager
-from src.advanced.twap import TWAPOrder, TWAPManager
-from src.advanced.grid_orders import GridOrder, GridOrderManager
 
 class BinanceBotCLI:
     """Main CLI class for the Binance Futures Order Bot"""
     
     def __init__(self):
-        self.client = BinanceClient()
-        self.market_manager = MarketOrderManager(self.client)
-        self.limit_manager = LimitOrderManager(self.client)
-        self.oco_manager = OCOOrderManager(self.client)
-        self.twap_manager = TWAPManager(self.client)
-        self.grid_manager = GridOrderManager(self.client)
+        self.client = None
+        self.market_manager = None
+        self.limit_manager = None
+        self.oco_manager = None
+        self.twap_manager = None
+        self.grid_manager = None
+    
+    def _initialize_managers(self):
+        """Initialize managers lazily when needed"""
+        if self.client is None:
+            try:
+                from src.api_client import BinanceClient
+                from src.market_orders import MarketOrderManager
+                from src.limit_orders import LimitOrderManager
+                from src.advanced.oco import OCOOrderManager
+                from src.advanced.twap import TWAPManager
+                from src.advanced.grid_orders import GridOrderManager
+                
+                self.client = BinanceClient()
+                self.market_manager = MarketOrderManager(self.client)
+                self.limit_manager = LimitOrderManager(self.client)
+                self.oco_manager = OCOOrderManager(self.client)
+                self.twap_manager = TWAPManager(self.client)
+                self.grid_manager = GridOrderManager(self.client)
+            except Exception as e:
+                logger.log_error(e, "Failed to initialize API client")
+                raise
     
     def run(self):
         """Main CLI entry point"""
@@ -78,6 +93,9 @@ Examples:
             return
         
         try:
+            # Initialize managers only when executing commands
+            self._initialize_managers()
+            
             # Execute the command
             command_method = getattr(self, f"cmd_{args.command.replace('-', '_')}")
             command_method(args)

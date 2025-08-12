@@ -1,0 +1,14 @@
+{
+  "test_timestamp": "2025-08-13T01:21:23.313236",
+  "project_name": "nishi-binance-bot",
+  "tests": {
+    "project_structure": true,
+    "cli_commands": true,
+    "requirements": true,
+    "readme": true,
+    "assignment_requirements": true
+  },
+  "overall_score": 100.0,
+  "passed_tests": 5,
+  "total_tests": 5
+}

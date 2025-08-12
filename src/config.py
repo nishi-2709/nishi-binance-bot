@@ -30,13 +30,47 @@ class LoggingConfig:
     log_file: str = "bot.log"
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+# Common constants
+SUPPORTED_SYMBOLS = [
+    "BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT",
+    "DOTUSDT", "LINKUSDT", "MATICUSDT", "AVAXUSDT", "UNIUSDT"
+]
+
+ORDER_TYPES = {
+    "MARKET": "MARKET",
+    "LIMIT": "LIMIT",
+    "STOP": "STOP",
+    "STOP_MARKET": "STOP_MARKET",
+    "TAKE_PROFIT": "TAKE_PROFIT",
+    "TAKE_PROFIT_MARKET": "TAKE_PROFIT_MARKET",
+    "TRAILING_STOP_MARKET": "TRAILING_STOP_MARKET"
+}
+
+SIDE_TYPES = {
+    "BUY": "BUY",
+    "SELL": "SELL"
+}
+
+TIME_IN_FORCE = {
+    "GTC": "GTC",  # Good Till Cancel
+    "IOC": "IOC",  # Immediate or Cancel
+    "FOK": "FOK"   # Fill or Kill
+}
+
 class Config:
     """Main configuration class"""
     
     def __init__(self):
-        self.binance = self._load_binance_config()
+        self._binance_config = None
         self.trading = TradingConfig()
         self.logging = LoggingConfig()
+    
+    @property
+    def binance(self) -> BinanceConfig:
+        """Lazy load Binance configuration"""
+        if self._binance_config is None:
+            self._binance_config = self._load_binance_config()
+        return self._binance_config
     
     def _load_binance_config(self) -> BinanceConfig:
         """Load Binance configuration from environment variables"""
@@ -63,31 +97,4 @@ class Config:
         }
 
 # Global configuration instance
-config = Config()
-
-# Common constants
-SUPPORTED_SYMBOLS = [
-    "BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT",
-    "DOTUSDT", "LINKUSDT", "MATICUSDT", "AVAXUSDT", "UNIUSDT"
-]
-
-ORDER_TYPES = {
-    "MARKET": "MARKET",
-    "LIMIT": "LIMIT",
-    "STOP": "STOP",
-    "STOP_MARKET": "STOP_MARKET",
-    "TAKE_PROFIT": "TAKE_PROFIT",
-    "TAKE_PROFIT_MARKET": "TAKE_PROFIT_MARKET",
-    "TRAILING_STOP_MARKET": "TRAILING_STOP_MARKET"
-}
-
-SIDE_TYPES = {
-    "BUY": "BUY",
-    "SELL": "SELL"
-}
-
-TIME_IN_FORCE = {
-    "GTC": "GTC",  # Good Till Cancel
-    "IOC": "IOC",  # Immediate or Cancel
-    "FOK": "FOK"   # Fill or Kill
-} 
+config = Config() 
